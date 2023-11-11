@@ -15,7 +15,7 @@ const Layout = () => {
             <Link to="/contact">Contact</Link>
           </li>
           <li>
-          <Link to="/signup">Signup</Link>
+            <Link to="/signup">Signup</Link>
           </li>
           <li>
             <Link to="/home">Home</Link>
@@ -31,7 +31,7 @@ const Layout = () => {
 
       <Outlet />
     </>
-  )
+  );
 };
 
 export default Layout;

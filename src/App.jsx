@@ -15,9 +15,7 @@ import Signup from "./pages/Signup";
 import Visualisations from "./pages/Visualisations";
 import Settings from "./pages/Settings";
 
-
 function App() {
-
   // loading wheel and modal states
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
