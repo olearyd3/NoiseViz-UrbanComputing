@@ -4,36 +4,40 @@ const Layout = () => {
   const location = useLocation();
 
   // Check if the current route is the root ("/") and render the Login link accordingly
-  const isRootRoute = location.pathname === "/";
+  const isLoginPage = location.pathname === "/";
+  const isSignupPage = location.pathname === "/signup";
+
+  const renderNavBar = !isLoginPage && !isSignupPage;
 
   return (
     <>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Login</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/contact">Contact</Link>
-          </li>
-          <li>
-            <Link to="/signup">Signup</Link>
-          </li>
-          <li>
-            <Link to="/home">Home</Link>
-          </li>
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-          <li>
-            <Link to="/visualisations">Visualisations</Link>
-          </li>
-        </ul>
-      </nav>
-
+      {renderNavBar && (
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Login</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
+            <li>
+              <Link to="/signup">Signup</Link>
+            </li>
+            <li>
+              <Link to="/home">Home</Link>
+            </li>
+            <li>
+              <Link to="/settings">Settings</Link>
+            </li>
+            <li>
+              <Link to="/visualisations">Visualisations</Link>
+            </li>
+          </ul>
+        </nav>
+      )}
       <Outlet />
     </>
   );
