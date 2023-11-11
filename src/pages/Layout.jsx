@@ -1,6 +1,11 @@
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 
 const Layout = () => {
+  const location = useLocation();
+
+  // Check if the current route is the root ("/") and render the Login link accordingly
+  const isRootRoute = location.pathname === "/";
+
   return (
     <>
       <nav>
