@@ -4,54 +4,19 @@ import { Auth } from "./components/auth";
 import { db } from "./config/firebase";
 import { getDocs, collection, addDoc } from "firebase/firestore";
 import { fetchDataFromAPI } from "./components/data";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./pages/Layout";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Visualisations from "./pages/Visualisations";
+import Settings from "./pages/Settings";
+
 
 function App() {
-  // health data from Apple app is NOT available in real-time
-  /* const [healthData, setHealthData] = useState([]);
-  const healthDataCollectionRef = collection(db, "health-data");
-  // function to handle CSV file upload
-  const handleCSVUpload = async (event) => {
-    const file = event.target.files[0];
-    console.log("Uploading health data...");
-    if (file) {
-      // read and parse the CSV file using PapaParse
-      Papa.parse(file, {
-        header: true,
-        dynamicTyping: true,
-        complete: async function (results) {
-          if (results.data && results.data.length > 0) {
-            // add each CSV record to the Firestore collection
-            for (const record of results.data) {
-              try {
-                await addDoc(healthDataCollectionRef, record);
-              } catch (err) {
-                console.log("Error adding document: ", err);
-              }
-            }
-          }
-        },
-        error: function (error) {
-          console.error("Error parsing CSV: ", error.message);
-        },
-      });
-    }
-  };
-
-  useEffect(() => {
-    const getHealthDataList = async () => {
-      try {
-        const data = await getDocs(healthDataCollectionRef);
-        const filteredData = data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setHealthData(filteredData);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getHealthDataList();
-  }, []); */
 
   // loading wheel and modal states
   const [loading, setLoading] = useState(false);
@@ -273,47 +238,19 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1>Urban Computing Assignment 3</h1>
-      {/* authentication not needed anymore but keeping for use with Assignment 4 potentially */}
-      <Auth />
-      {/* <div className="csvInputContainer">
-        <p>Upload data from a CSV file here: </p>
-        <input type="file" accept=".csv" onChange={handleCSVUpload} />
-      </div> */}
-      <div>
-        <button onClick={uploadOpenData}>
-          Upload real-time noise data from Dolphin's Barn to Firebase using
-          Sonitus API
-        </button>
-      </div>
-      <div>
-        <button onClick={handleMicrophoneButtonClick}>
-          Start Measuring Decibels for 5 Seconds
-        </button>
-      </div>
-      <div>
-        <button onClick={uploadLocationToFirebase}>
-          Upload Current Location to Firebase
-        </button>
-      </div>
-      <div className="locationData">
-        <h2>Current Coordinates</h2>
-        <p>Latitude: {latitude}</p>
-        <p>Longitude: {longitude}</p>
-      </div>
-      {loading && <div className="loading-spinner"></div>}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModal}>
-              &times;
-            </span>
-            <p>{modalMessage}</p>
-          </div>
-        </div>
-      )}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Login />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="home" element={<Home />} />
+          <Route path="signup" element={<Signup />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="visualisations" element={<Visualisations />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
