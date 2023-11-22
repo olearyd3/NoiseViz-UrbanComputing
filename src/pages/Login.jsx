@@ -48,8 +48,8 @@ function Login() {
 
   return (
     <div>
-        <h1>NoiseViz Dublin</h1>
-        <h2>Urban Computing Application</h2>
+      <h1>NoiseViz Dublin</h1>
+      <h2>Urban Computing Application</h2>
       <h2>Login</h2>
       <form>
         <div>

@@ -161,6 +161,9 @@ function Home() {
     setMicrophoneActive(false);
   };
 
+  const decibelReadingsRef = useRef([]);
+  const [averageDecibel, setAverageDecibel] = useState(null);
+
   useEffect(() => {
     let isUnmounted = false;
     // Request permission to access the microphone
@@ -195,8 +198,12 @@ function Home() {
             // using 94 as DeciBel calibration value
             var decibels = 20 * Math.log10(average / 255) + 94;
 
+            if (decibels !== -Infinity) {
+              decibelReadingsRef.current.push(decibels);
+            }
+
             // Send decibel level to your server or do something with it
-            console.log("Decibels:", decibels);
+            //console.log("Decibels:", decibels);
           }
           // Repeat the process
           if (!isUnmounted) {
@@ -217,10 +224,20 @@ function Home() {
 
   const handleMicrophoneButtonClick = () => {
     startMicrophone();
-
+    decibelReadingsRef.current = [];
     // Stop measuring after 5 seconds
     setTimeout(() => {
       stopMicrophone();
+
+      const readings = decibelReadingsRef.current;
+      if (readings.length > 0) {
+        const sum = readings.reduce((acc, val) => acc + val, 0);
+        const average = sum / readings.length;
+        setAverageDecibel(average);
+        console.log("Average Decibels:", average);
+      } else {
+        console.log("No valid decibel readings.");
+      }
     }, 5000);
   };
   return (
@@ -236,6 +253,12 @@ function Home() {
         <button onClick={handleMicrophoneButtonClick}>
           Start Measuring Decibels for 5 Seconds
         </button>
+        {averageDecibel !== null && (
+          <p>
+            Average Decibel reading over the last 5 seconds:{" "}
+            {averageDecibel.toFixed(2)}
+          </p>
+        )}
       </div>
       <div>
         <button onClick={uploadLocationToFirebase}>
