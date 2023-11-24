@@ -1,7 +1,9 @@
-function fetchDataFromAPI() {
+function fetchDataFromAPI(monitorId) {
   const corsProxyUrl = "https://cors-anywhere.herokuapp.com/";
   const baseUrl =
-    "https://data.smartdublin.ie/sonitus-api/api/data?username=dublincityapi&password=Xpa5vAQ9ki&monitor=01550&start=";
+    "https://data.smartdublin.ie/sonitus-api/api/data?username=dublincityapi&password=Xpa5vAQ9ki&monitor=" +
+    monitorId +
+    "&start=";
 
   // get the current time
   const currentTimestamp = Date.now();

@@ -166,10 +166,6 @@ button:focus-visible {
   }
 }
 
-#map {
-  height: 180px;
-}
-
 nav ul {
   list-style: none;
   display: flex;

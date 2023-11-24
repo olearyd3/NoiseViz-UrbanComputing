@@ -3,6 +3,7 @@ import "../App.css";
 import { db } from "../config/firebase";
 import { getDocs, collection, addDoc } from "firebase/firestore";
 import { fetchDataFromAPI } from "../components/data";
+import monitorInfo from "../monitorInfo.json";
 
 function Home() {
   // loading wheel and modal states
@@ -28,8 +29,9 @@ function Home() {
       console.log("Started fetching and uploading data...");
 
       // get data from the API
-      const data = await fetchDataFromAPI();
+      //const data = await fetchDataFromAPI("01550");
 
+      const data = await fetchDataFromAPI("01550");
       const openDataCollectionRef = collection(db, "sonitus-dolphins-barn");
 
       // get the existing data from Firebase and store in a map
@@ -240,6 +242,17 @@ function Home() {
       }
     }, 5000);
   };
+
+  const testing = async () => {
+    for (const monitor of monitorInfo) {
+      const serialNumber = monitor.serial_number;
+
+      // get data from the API for each monitor
+      const data = await fetchDataFromAPI(serialNumber);
+      console.log(serialNumber, data);
+    }
+  };
+
   return (
     <div className="App">
       <h1>Urban Computing Assignment 3</h1>
@@ -263,6 +276,11 @@ function Home() {
       <div>
         <button onClick={uploadLocationToFirebase}>
           Upload Current Location to Firebase
+        </button>
+      </div>
+      <div>
+        <button onClick={testing}>
+          Testing fetching data for all monitors
         </button>
       </div>
       <div className="locationData">
