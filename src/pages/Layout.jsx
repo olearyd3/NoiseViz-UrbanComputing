@@ -27,9 +27,6 @@ const Layout = () => {
             <li>
               <Link to="/settings">Settings</Link>
             </li>
-            <li>
-              <Link to="/visualisations">Visualisations</Link>
-            </li>
           </ul>
         </nav>
       )}

@@ -4,6 +4,8 @@ import { db } from "../config/firebase";
 import { getDocs, collection, addDoc } from "firebase/firestore";
 import { fetchDataFromAPI } from "../components/data";
 import monitorInfo from "../monitorInfo.json";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import Visualisations from "./Visualisations";
 
 function Home() {
   // loading wheel and modal states
@@ -27,53 +29,61 @@ function Home() {
     try {
       setLoading(true);
       console.log("Started fetching and uploading data...");
-
-      // get data from the API
-      //const data = await fetchDataFromAPI("01550");
-
-      const data = await fetchDataFromAPI("01550");
-      const openDataCollectionRef = collection(db, "sonitus-dolphins-barn");
-
-      // get the existing data from Firebase and store in a map
-      const existingData = await getDocs(openDataCollectionRef);
-      const existingDataMap = new Map();
-
-      // creating a map of the existing data with datetime values as keys
-      existingData.docs.forEach((doc) => {
-        const docData = doc.data();
-        existingDataMap.set(docData.datetime, docData);
-      });
-
-      // filter out data that is already on Firebase for the current monitor based on its datetime
-      const newData = data.filter(
-        (item) => !existingDataMap.has(item.datetime),
-      );
-
-      // if no new data, print up-to-date
-      if (newData.length === 0) {
-        console.log("Data already up-to-date");
-      } else {
-        // add the new data to Firebase
-        for (const item of newData) {
-          try {
-            await addDoc(openDataCollectionRef, item);
-            console.log("Uploaded data: ", item);
-          } catch (error) {
-            console.error("Error adding document: ", error);
+  
+      // Loop through each monitor in monitorInfo.json
+      for (const monitor of monitorInfo) {
+        const serialNumber = monitor.serial_number;
+  
+        // get data from the API for each monitor
+        const data = await fetchDataFromAPI(serialNumber);
+        const openDataCollectionRef = collection(db, "sonitus-data-from-api");
+  
+        // get the existing data from Firebase and store in a map
+        const existingData = await getDocs(openDataCollectionRef);
+        const existingDataMap = new Map();
+  
+        // creating a map of the existing data with datetime values as keys
+        existingData.docs.forEach((doc) => {
+          const docData = doc.data();
+          const compositeKey = `${docData.datetime}_${docData.serial_number}`;
+          existingDataMap.set(compositeKey, docData);
+        });
+  
+        // filter out data that is already on Firebase for the current monitor based on its datetime
+        const newData = data.filter(
+          (item) => {
+            const compositeKey = `${item.datetime}_${serialNumber}`;
+            return !existingDataMap.has(compositeKey);
           }
+        );
+  
+        // if no new data, print up-to-date
+        if (newData.length === 0) {
+          console.log(`Data for monitor ${serialNumber} is already up-to-date`);
+        } else {
+          // add the new data to Firebase along with serial_number
+          for (const item of newData) {
+            try {
+              await addDoc(openDataCollectionRef, { ...item, serial_number: serialNumber });
+              console.log(`Uploaded data for monitor ${serialNumber}: `, item);
+            } catch (error) {
+              console.error(`Error adding document for monitor ${serialNumber}: `, error);
+            }
+          }
+          // print that the data was successfully uploaded
+          console.log(`Successfully uploaded data for monitor ${serialNumber} to Firebase!`);
         }
-        // print that the data was successfully uploaded
-        setLoading(false);
-        openModal("Data successfully uploaded to Firebase!");
-        console.log("Successfully uploaded data to Firebase!");
       }
+  
+      setLoading(false);
+      openModal("Data successfully uploaded to Firebase!");
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
       openModal("Error uploading data: " + error);
     }
   };
-
+  
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
@@ -252,10 +262,11 @@ function Home() {
       console.log(serialNumber, data);
     }
   };
-
+  
   return (
     <div className="App">
       <h1>Urban Computing Assignment 3</h1>
+      <Visualisations />
       <div>
         <button onClick={uploadOpenData}>
           Upload real-time noise data from Dolphin's Barn to Firebase using
@@ -282,11 +293,6 @@ function Home() {
         <button onClick={testing}>
           Testing fetching data for all monitors
         </button>
-      </div>
-      <div className="locationData">
-        <h2>Current Coordinates</h2>
-        <p>Latitude: {latitude}</p>
-        <p>Longitude: {longitude}</p>
       </div>
       {loading && <div className="loading-spinner"></div>}
       {showModal && (

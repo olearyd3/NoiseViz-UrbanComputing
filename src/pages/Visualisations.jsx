@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useState, useEffect } from "react";
 import monitorInfo from "../monitorInfo.json";
+import { fetchDataFromAPI } from "../components/data";
 
 const Visualisations = () => {
   const [markers, setMarkers] = useState([]);
@@ -50,14 +51,22 @@ const Visualisations = () => {
 
   useEffect(() => {
     // Simulating an asynchronous data fetch (e.g., loading from an API)
-    setTimeout(() => {
-      // Transform monitorInfo.json data into markers array
-      const newMarkers = monitorInfo.map((info) => ({
-        position: [parseFloat(info.latitude), parseFloat(info.longitude)],
-        label: info.label,
-        location: info.location,
-      }));
-
+    setTimeout(async () => {
+      const newMarkers = await Promise.all(
+        monitorInfo.map(async (info) => {
+          const data = await fetchDataFromAPI(info.serial_number);
+          const latestData = data.length > 0 ? data[data.length - 1] : null;
+  
+          return {
+            position: [parseFloat(info.latitude), parseFloat(info.longitude)],
+            label: info.label,
+            location: info.location,
+            laeq: latestData ? latestData.laeq : null,
+            timestamp: latestData ? latestData.datetime : null,
+          };
+        })
+      );
+  
       setMarkers(newMarkers);
     }, 2000); // Simulating a 2-second delay; replace this with your actual data fetching logic
   }, []);
@@ -81,7 +90,6 @@ const Visualisations = () => {
   return (
     <div>
       <div>
-        <h1>Visualisations</h1>
         <div id="map">{loading && <p>Loading Map...</p>}</div>
       </div>
       {latitude !== null && longitude !== null && !loading && (
@@ -92,13 +100,23 @@ const Visualisations = () => {
           />
           {markers.map((marker, index) => (
             <Marker key={index} position={marker.position} icon={blueMarker}>
-              <Popup>
+            <Popup>
+              <div>
+                <strong>{marker.location}</strong>
+              </div>
+              <div>{marker.label}</div>
+              {marker.laeq !== null && (
                 <div>
-                  <strong>{marker.location}</strong>
+                  Most recent laeq reading: {marker.laeq.toFixed(2)} dB
                 </div>
-                <div>{marker.label}</div>
-              </Popup>
-            </Marker>
+              )}
+              {marker.timestamp !== null && (
+        <div>
+          Last updated at: {new Date(marker.timestamp).toLocaleString()}
+        </div>
+      )}
+            </Popup>
+          </Marker>
           ))}
           <Marker position={[latitude, longitude]} icon={whiteMarker}>
             <Popup>
