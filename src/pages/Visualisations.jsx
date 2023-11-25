@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import monitorInfo from "../monitorInfo.json";
 import { fetchDataFromAPI } from "../components/data";
 
-const Visualisations = () => {
+const Visualisations = ({ averageDecibel }) => {
   const [markers, setMarkers] = useState([]);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -56,7 +56,7 @@ const Visualisations = () => {
         monitorInfo.map(async (info) => {
           const data = await fetchDataFromAPI(info.serial_number);
           const latestData = data.length > 0 ? data[data.length - 1] : null;
-  
+
           return {
             position: [parseFloat(info.latitude), parseFloat(info.longitude)],
             label: info.label,
@@ -64,9 +64,9 @@ const Visualisations = () => {
             laeq: latestData ? latestData.laeq : null,
             timestamp: latestData ? latestData.datetime : null,
           };
-        })
+        }),
       );
-  
+
       setMarkers(newMarkers);
     }, 2000); // Simulating a 2-second delay; replace this with your actual data fetching logic
   }, []);
@@ -100,27 +100,31 @@ const Visualisations = () => {
           />
           {markers.map((marker, index) => (
             <Marker key={index} position={marker.position} icon={blueMarker}>
-            <Popup>
-              <div>
-                <strong>{marker.location}</strong>
-              </div>
-              <div>{marker.label}</div>
-              {marker.laeq !== null && (
+              <Popup>
                 <div>
-                  Most recent laeq reading: {marker.laeq.toFixed(2)} dB
+                  <strong>{marker.location}</strong>
                 </div>
-              )}
-              {marker.timestamp !== null && (
-        <div>
-          Last updated at: {new Date(marker.timestamp).toLocaleString()}
-        </div>
-      )}
-            </Popup>
-          </Marker>
+                <div>{marker.label}</div>
+                {marker.laeq !== null && (
+                  <div>
+                    Most recent laeq reading: {marker.laeq.toFixed(2)} dB
+                  </div>
+                )}
+                {marker.timestamp !== null && (
+                  <div>
+                    Last updated at:{" "}
+                    {new Date(marker.timestamp).toLocaleString()}
+                  </div>
+                )}
+              </Popup>
+            </Marker>
           ))}
           <Marker position={[latitude, longitude]} icon={whiteMarker}>
             <Popup>
               Latitude: {latitude}, Longitude: {longitude}
+              {averageDecibel !== null && (
+                <div>Average Decibel: {averageDecibel.toFixed(2)} dB</div>
+              )}
             </Popup>
           </Marker>
         </MapContainer>
