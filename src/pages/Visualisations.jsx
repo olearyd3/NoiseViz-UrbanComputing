@@ -62,6 +62,22 @@ const Visualisations = () => {
     }, 2000); // Simulating a 2-second delay; replace this with your actual data fetching logic
   }, []);
 
+  const whiteMarker = new L.Icon({
+    iconUrl:
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFFFFF&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+  const blueMarker = new L.Icon({
+    iconUrl:
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|0099FF&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
   return (
     <div>
       <div>
@@ -75,7 +91,7 @@ const Visualisations = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {markers.map((marker, index) => (
-            <Marker key={index} position={marker.position}>
+            <Marker key={index} position={marker.position} icon={blueMarker}>
               <Popup>
                 <div>
                   <strong>{marker.location}</strong>
@@ -84,6 +100,11 @@ const Visualisations = () => {
               </Popup>
             </Marker>
           ))}
+          <Marker position={[latitude, longitude]} icon={whiteMarker}>
+            <Popup>
+              Latitude: {latitude}, Longitude: {longitude}
+            </Popup>
+          </Marker>
         </MapContainer>
       )}
     </div>
