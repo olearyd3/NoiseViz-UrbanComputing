@@ -86,6 +86,81 @@ const Visualisations = ({ averageDecibel }) => {
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
+  const yellowMarker = new L.Icon({
+    iconUrl:
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFF700&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+  const orangeMarker = new L.Icon({
+    iconUrl:
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFA500&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+  const redMarker = new L.Icon({
+    iconUrl:
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+  const blackMarker = new L.Icon({
+    iconUrl:
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|000000&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+  const getMarkerIcon = (laeq) => {
+    if (laeq === null) {
+      return blueMarker;
+    } else if (laeq < 50) {
+      return blueMarker;
+    } else if (laeq >= 50 && laeq < 70) {
+      return yellowMarker;
+    } else if (laeq >= 70 && laeq < 85) {
+      return orangeMarker;
+    } else if (laeq >= 85 && laeq <= 119) {
+      return redMarker;
+    } else {
+      return blackMarker;
+    }
+  };
+
+  const Legend = () => {
+    return (
+      <div>
+        <p>
+          Legend:
+          <span style={{ color: "#0099FF" }}> Blue: Low Noise (&lt;50 dB)</span>
+          ,
+          <span style={{ color: "#FFF700" }}>
+            {" "}
+            Yellow: Moderate Noise (50-70 dB)
+          </span>
+          ,
+          <span style={{ color: "#FFA500" }}>
+            {" "}
+            Orange: Loud Noise (70-85 dB)
+          </span>
+          ,
+          <span style={{ color: "#FF0000" }}>
+            {" "}
+            Red: Very Loud Noise (86-120 dB)
+          </span>
+          ,
+          <span style={{ color: "#000000" }}>
+            {" "}
+            Black: Dangerous Noise (120 dB +)
+          </span>
+        </p>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -99,7 +174,11 @@ const Visualisations = ({ averageDecibel }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {markers.map((marker, index) => (
-            <Marker key={index} position={marker.position} icon={blueMarker}>
+            <Marker
+              key={index}
+              position={marker.position}
+              icon={getMarkerIcon(marker.laeq)}
+            >
               <Popup>
                 <div>
                   <strong>{marker.location}</strong>
@@ -129,6 +208,7 @@ const Visualisations = ({ averageDecibel }) => {
           </Marker>
         </MapContainer>
       )}
+      <Legend />
     </div>
   );
 };

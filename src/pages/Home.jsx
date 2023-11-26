@@ -240,11 +240,13 @@ function Home() {
     };
   }, [microphoneActive]);
 
-  const handleMicrophoneButtonClick = () => {
+  const handleMicrophoneButtonClick = async () => {
     startMicrophone();
     decibelReadingsRef.current = [];
     // Stop measuring after 5 seconds
-    setTimeout(() => {
+    const startTime = new Date();
+
+    setTimeout(async () => {
       stopMicrophone();
 
       const readings = decibelReadingsRef.current;
@@ -252,7 +254,37 @@ function Home() {
         const sum = readings.reduce((acc, val) => acc + val, 0);
         const average = sum / readings.length;
         setAverageDecibel(average);
-        console.log("Average Decibels:", average);
+        const locationData = {
+          datetime: new Date(),
+          latitude,
+          longitude,
+        };
+
+        // Upload data to Firebase
+        const decibelCollectionRef = collection(db, "location-decibel-data");
+        try {
+          setLoading(true);
+
+          // Upload average decibel data
+          await addDoc(decibelCollectionRef, {
+            datetime: startTime,
+            latitude,
+            longitude,
+            averageDecibel: average,
+          });
+
+          setLoading(false);
+          console.log("Data uploaded to Firebase:", {
+            datetime: startTime,
+            latitude,
+            longitude,
+            averageDecibel: average,
+          });
+        } catch (error) {
+          console.error("Error uploading data to Firebase:", error);
+          setLoading(false);
+          openModal("Error uploading data to Firebase: " + error);
+        }
       } else {
         console.log("No valid decibel readings.");
       }
@@ -281,7 +313,7 @@ function Home() {
       </div>
       <div>
         <button onClick={handleMicrophoneButtonClick}>
-          Start Measuring Decibels for 5 Seconds
+          Start Measuring Decibels for 5 Seconds and upload to Firebase
         </button>
         {averageDecibel !== null && (
           <p>
