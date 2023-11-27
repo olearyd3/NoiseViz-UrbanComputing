@@ -128,50 +128,6 @@
   background-color: #303030;
   opacity: 8%;
 }
-/* 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-th,
-td {
-  border: 1px solid #999999;
-  padding: 8px;
-  text-align: left;
-}
-
-.ep {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  margin-top: 2em;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  border-color: rgba(100, 100, 100, 0.87);
-}
-*/
 
 input {
   border-radius: 8px;
@@ -472,4 +428,9 @@ h1 {
 
 .dropdown-container {
   margin-top: 1em;
+}
+
+.axis-label {
+  font-size: 12px;
+  fill: #cccccc; 
 }

@@ -8,9 +8,9 @@ This is my web app, NoiseViz, created as part of Assignment 4 for the module CS7
 
 2. Install relevant dependencies using npm:
 
-        `npm install react`
-        `npm install d3`
-        `npm install react-leaflet`
+        npm install react
+        npm install d3
+        npm install react-leaflet
 
 3. Due to potential CORS issues when running locally, a CORS proxy has been included. To activate it visit "https://cors-anywhere.herokuapp.com/" and request temporary access.
 
