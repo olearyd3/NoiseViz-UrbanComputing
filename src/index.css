@@ -469,3 +469,7 @@ h1 {
   font-size: 1.5em;
   line-height: 1.1;
 }
+
+.dropdown-container {
+  margin-top: 1em;
+}

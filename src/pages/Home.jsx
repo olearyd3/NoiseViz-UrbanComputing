@@ -14,6 +14,7 @@ function Home() {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const timeoutRef = useRef(null);
+  const [selectedMonitor, setSelectedMonitor] = useState("01550");
 
   // handling opening and closing the modal
   const openModal = (message) => {
@@ -290,7 +291,7 @@ function Home() {
   };
 
   const fetchMonitorData = async () => {
-    const serialNumber = "10.1.1.1"; // Replace with the desired serial_number
+    const serialNumber = selectedMonitor; // Replace with the desired serial_number
     const data = await fetchDataFromAPI(serialNumber, true);
     console.log(data);
     // You may want to filter the data to get the most recent 6 hours
@@ -309,7 +310,7 @@ function Home() {
   const drawLineChart = (data) => {
     // Select the container for the chart
     const chartContainer = d3.select(".chart-container");
-
+    chartContainer.selectAll("svg").remove();
     // Set up the dimensions of the chart
     const width = 600;
     const height = 300;
@@ -370,7 +371,7 @@ function Home() {
     svg
       .append("rect")
       .attr("width", width)
-      .attr("height", innerHeight)
+      .attr("height", height)
       .style("fill", "none")
       .style("pointer-events", "all")
       .on("mouseover", () => tooltip.style("opacity", 1))
@@ -385,7 +386,7 @@ function Home() {
 
     // Set the domain of the scales
     xScale.domain(d3.extent(data, (d) => parseTime(d.datetime)));
-    yScale.domain([0, 130]);
+    yScale.domain([0, d3.max(data, (d) => d.laeq) + 10]);
 
     // Append X and Y axes
     svg
@@ -411,7 +412,14 @@ function Home() {
   useEffect(() => {
     console.log("effect triggered");
     fetchMonitorData();
-  }, []);
+    return () => {
+      d3.select(".chart-container").selectAll(".tooltip").remove();
+    };
+  }, [selectedMonitor]);
+
+  const handleMonitorChange = (event) => {
+    setSelectedMonitor(event.target.value);
+  };
 
   return (
     <div className="App">
@@ -439,9 +447,7 @@ function Home() {
             style={{ "--clr": "#FF44CC" }}
             onClick={handleMicrophoneButtonClick}
           >
-            <span>
-              Start Measuring Decibels for 5 Seconds and upload to Firebase
-            </span>
+            <span>Measure Current Noise Levels at your Location</span>
             <i></i>
           </button>
           {averageDecibel !== null && (
@@ -458,6 +464,23 @@ function Home() {
             <span>Upload Current Location to Firebase</span>
             <i></i>
           </button>
+          <div className="dropdown-container">
+            <label htmlFor="monitorDropdown">Select Monitor: </label>
+            <select
+              id="monitorDropdown"
+              value={selectedMonitor}
+              onChange={handleMonitorChange}
+            >
+              {monitorInfo.map((monitor) => (
+                <option
+                  key={monitor.serial_number}
+                  value={monitor.serial_number}
+                >
+                  {monitor.location}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="chart-container"></div>
         </div>
       </div>
