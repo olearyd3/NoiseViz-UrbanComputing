@@ -21,7 +21,9 @@ const Layout = () => {
                 <FontAwesomeIcon icon={faHome} style={{ fontSize: "35px" }} />
               </Link>
             </li>
-            <li className="title-icon">NoiseViz</li>
+            <li className="title-icon">
+              <Link to="/d3Graph">NoiseViz</Link>
+            </li>
             <li className="settings-icon">
               <Link to="/settings">
                 <FontAwesomeIcon icon={faCog} style={{ fontSize: "35px" }} />

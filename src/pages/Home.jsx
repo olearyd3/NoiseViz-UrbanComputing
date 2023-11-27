@@ -6,6 +6,7 @@ import { fetchDataFromAPI } from "../components/data";
 import monitorInfo from "../monitorInfo.json";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import Visualisations from "./Visualisations";
+import * as d3 from "d3";
 
 function Home() {
   // loading wheel and modal states
@@ -35,7 +36,7 @@ function Home() {
         const serialNumber = monitor.serial_number;
 
         // get data from the API for each monitor
-        const data = await fetchDataFromAPI(serialNumber);
+        const data = await fetchDataFromAPI(serialNumber, false);
         const openDataCollectionRef = collection(db, "sonitus-data-from-api");
 
         // get the existing data from Firebase and store in a map
@@ -288,6 +289,130 @@ function Home() {
     }, 5000);
   };
 
+  const fetchMonitorData = async () => {
+    const serialNumber = "10.1.1.1"; // Replace with the desired serial_number
+    const data = await fetchDataFromAPI(serialNumber, true);
+    console.log(data);
+    // You may want to filter the data to get the most recent 6 hours
+    // This depends on the structure of your data and how the datetime is formatted
+    const now = new Date();
+    const sixHoursAgo = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+
+    const filteredData = data.filter(
+      (item) => new Date(item.datetime) >= sixHoursAgo,
+    );
+    console.log(filteredData);
+    // Call the function to draw the line chart with the filteredData
+    drawLineChart(filteredData);
+  };
+
+  const drawLineChart = (data) => {
+    // Select the container for the chart
+    const chartContainer = d3.select(".chart-container");
+
+    // Set up the dimensions of the chart
+    const width = 600;
+    const height = 300;
+    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+
+    function handleMouseMove(event) {
+      // Use the xScale.invert function to get the corresponding date for the mouse position
+      const mouseX = d3.pointer(event)[0] - margin.left;
+      const date = xScale.invert(mouseX);
+
+      // Use bisect to find the data point closest to the mouse position
+      const bisectDate = d3.bisector((d) => parseTime(d.datetime)).left;
+      const index = bisectDate(data, date, 1);
+      const leftData = data[index - 1];
+      const rightData = data[index];
+
+      // Determine which data point is closer to the mouse position
+      const closestData =
+        rightData &&
+        date - parseTime(leftData.datetime) >
+          parseTime(rightData.datetime) - date
+          ? rightData
+          : leftData;
+
+      // Show tooltip at the mouse position with y-value information
+      tooltip
+        .html(
+          `<strong>Date:</strong> ${
+            closestData.datetime
+          }<br/><strong>Decibel:</strong> ${closestData.laeq.toFixed(2)}`,
+        )
+        .style("left", `${event.pageX}px`)
+        .style("top", `${event.pageY - 28}px`);
+    }
+
+    // Create an SVG element
+    const svg = chartContainer
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    // Parse the datetime strings to Date objects
+    const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+    // Set up the scales
+    const xScale = d3.scaleTime().range([0, innerWidth]);
+    const yScale = d3.scaleLinear().range([innerHeight, 0]);
+
+    const tooltip = d3
+      .select(".chart-container")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Append a rect to capture mouse events
+    svg
+      .append("rect")
+      .attr("width", width)
+      .attr("height", innerHeight)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .on("mouseover", () => tooltip.style("opacity", 1))
+      .on("mousemove", handleMouseMove)
+      .on("mouseout", () => tooltip.style("opacity", 0));
+
+    // Set up the line
+    const line = d3
+      .line()
+      .x((d) => xScale(parseTime(d.datetime)) + margin.left)
+      .y((d) => yScale(d.laeq));
+
+    // Set the domain of the scales
+    xScale.domain(d3.extent(data, (d) => parseTime(d.datetime)));
+    yScale.domain([0, 130]);
+
+    // Append X and Y axes
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${height - margin.bottom})`)
+      .call(d3.axisBottom(xScale));
+
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`)
+      .call(d3.axisLeft(yScale));
+
+    // Append the line to the chart
+    svg
+      .append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", line);
+  };
+
+  useEffect(() => {
+    console.log("effect triggered");
+    fetchMonitorData();
+  }, []);
+
   return (
     <div className="App">
       <h1></h1>
@@ -333,6 +458,7 @@ function Home() {
             <span>Upload Current Location to Firebase</span>
             <i></i>
           </button>
+          <div className="chart-container"></div>
         </div>
       </div>
       {loading && <div className="loading-spinner"></div>}
