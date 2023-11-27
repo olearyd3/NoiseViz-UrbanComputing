@@ -8,6 +8,7 @@ const Visualisations = ({ averageDecibel }) => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [firebaseData, setFirebaseData] = useState([]);
   let watchId;
 
   const calculateLocation = () => {
@@ -43,14 +44,14 @@ const Visualisations = ({ averageDecibel }) => {
   useEffect(() => {
     calculateLocation();
 
-    // Clean up the geolocation watch when the component unmounts
+    // clean up the geolocation watch when the component unmounts
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
   }, []);
 
   useEffect(() => {
-    // Simulating an asynchronous data fetch (e.g., loading from an API)
+    // simulating an asynchronous data fetch (e.g., loading from an API)
     setTimeout(async () => {
       const newMarkers = await Promise.all(
         monitorInfo.map(async (info) => {
@@ -68,12 +69,12 @@ const Visualisations = ({ averageDecibel }) => {
       );
 
       setMarkers(newMarkers);
-    }, 2000); // Simulating a 2-second delay; replace this with your actual data fetching logic
-  }, []);
+    }, 2000);
+  }, [firebaseData]);
 
   const whiteMarker = new L.Icon({
     iconUrl:
-      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFFFFF&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFFFFF&chf=a,s,ee00FFFF",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
@@ -81,35 +82,35 @@ const Visualisations = ({ averageDecibel }) => {
 
   const blueMarker = new L.Icon({
     iconUrl:
-      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|0099FF&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|0099FF&chf=a,s,ee00FFFF",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
   const yellowMarker = new L.Icon({
     iconUrl:
-      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFF700&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFF700&chf=a,s,ee00FFFF",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
   const orangeMarker = new L.Icon({
     iconUrl:
-      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFA500&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FFA500&chf=a,s,ee00FFFF",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
   const redMarker = new L.Icon({
     iconUrl:
-      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000&chf=a,s,ee00FFFF",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
   const blackMarker = new L.Icon({
     iconUrl:
-      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|000000&chf=a,s,ee00FFFF", // Replace with the path to your black marker icon
+      "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|000000&chf=a,s,ee00FFFF",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
@@ -129,37 +130,6 @@ const Visualisations = ({ averageDecibel }) => {
     } else {
       return blackMarker;
     }
-  };
-
-  const Legend = () => {
-    return (
-      <div>
-        <p>
-          Legend:
-          <span style={{ color: "#0099FF" }}> Blue: Low Noise (&lt;50 dB)</span>
-          ,
-          <span style={{ color: "#FFF700" }}>
-            {" "}
-            Yellow: Moderate Noise (50-70 dB)
-          </span>
-          ,
-          <span style={{ color: "#FFA500" }}>
-            {" "}
-            Orange: Loud Noise (70-85 dB)
-          </span>
-          ,
-          <span style={{ color: "#FF0000" }}>
-            {" "}
-            Red: Very Loud Noise (86-120 dB)
-          </span>
-          ,
-          <span style={{ color: "#000000" }}>
-            {" "}
-            Black: Dangerous Noise (120 dB +)
-          </span>
-        </p>
-      </div>
-    );
   };
 
   return (
@@ -208,7 +178,35 @@ const Visualisations = ({ averageDecibel }) => {
           </Marker>
         </MapContainer>
       )}
-      <Legend />
+      <div className="my-legend">
+        <div className="legend-title">
+          Map of Real-Time Noise Data in Dublin
+        </div>
+        <div className="legend-scale">
+          <ul className="legend-labels">
+            <li>
+              <span style={{ background: "#0099FF" }}></span>
+              <p>&lt;50 dB</p>
+            </li>
+            <li>
+              <span style={{ background: "#FFF700" }}></span>
+              <p>50-70 dB</p>
+            </li>
+            <li>
+              <span style={{ background: "#FFA500" }}></span>
+              <p>70-85 dB</p>
+            </li>
+            <li>
+              <span style={{ background: "#FF0000" }}></span>
+              <p>85-119 dB</p>
+            </li>
+            <li>
+              <span style={{ background: "#000000" }}></span>
+              <p>&gt;120 dB </p>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

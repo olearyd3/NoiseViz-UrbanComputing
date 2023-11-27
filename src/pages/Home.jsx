@@ -30,7 +30,7 @@ function Home() {
       setLoading(true);
       console.log("Started fetching and uploading data...");
 
-      // Loop through each monitor in monitorInfo.json
+      // loop through each monitor in monitorInfo.json
       for (const monitor of monitorInfo) {
         const serialNumber = monitor.serial_number;
 
@@ -83,6 +83,7 @@ function Home() {
 
       setLoading(false);
       openModal("Data successfully uploaded to Firebase!");
+      setFirebaseData(newData);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
@@ -184,30 +185,30 @@ function Home() {
 
   useEffect(() => {
     let isUnmounted = false;
-    // Request permission to access the microphone
+    // request permission to access the microphone
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(function (stream) {
-        // Create an audio context
+        // create an audio context
         var audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
         var analyser = audioContext.createAnalyser();
 
-        // Connect the microphone stream to the analyser
+        // connect the microphone stream to the analyser
         var microphone = audioContext.createMediaStreamSource(stream);
         microphone.connect(analyser);
 
-        // Set up the analyser to get time-domain data
+        // set up the analyser to get time-domain data
         analyser.fftSize = 256;
         var bufferLength = analyser.frequencyBinCount;
         var dataArray = new Uint8Array(bufferLength);
 
-        // Function to calculate decibel levels
+        // function to calculate decibel levels
         function calculateDecibels() {
           if (!isUnmounted && microphoneActive) {
             analyser.getByteFrequencyData(dataArray);
 
-            // Calculate the average amplitude
+            // calculate the average amplitude
             var sum = dataArray.reduce(function (acc, val) {
               return acc + val;
             }, 0);
@@ -219,17 +220,13 @@ function Home() {
             if (decibels !== -Infinity) {
               decibelReadingsRef.current.push(decibels);
             }
-
-            // Send decibel level to your server or do something with it
-            //console.log("Decibels:", decibels);
           }
-          // Repeat the process
+          // repeat if not unmounted
           if (!isUnmounted) {
             requestAnimationFrame(calculateDecibels);
           }
         }
-
-        // Start calculating decibel levels
+        // calc decibel levels
         calculateDecibels();
       })
       .catch(function (err) {
@@ -243,7 +240,7 @@ function Home() {
   const handleMicrophoneButtonClick = async () => {
     startMicrophone();
     decibelReadingsRef.current = [];
-    // Stop measuring after 5 seconds
+    // stop measuring after 5 seconds
     const startTime = new Date();
 
     setTimeout(async () => {
@@ -260,12 +257,12 @@ function Home() {
           longitude,
         };
 
-        // Upload data to Firebase
+        // upload data to Firebase
         const decibelCollectionRef = collection(db, "location-decibel-data");
         try {
           setLoading(true);
 
-          // Upload average decibel data
+          // upload average decibel data
           await addDoc(decibelCollectionRef, {
             datetime: startTime,
             latitude,
@@ -291,46 +288,52 @@ function Home() {
     }, 5000);
   };
 
-  const testing = async () => {
-    for (const monitor of monitorInfo) {
-      const serialNumber = monitor.serial_number;
-
-      // get data from the API for each monitor
-      const data = await fetchDataFromAPI(serialNumber);
-      console.log(serialNumber, data);
-    }
-  };
-
   return (
     <div className="App">
-      <h1>Urban Computing Assignment 3</h1>
-      <Visualisations averageDecibel={averageDecibel} />
-      <div>
-        <button onClick={uploadOpenData}>
-          Upload real-time noise data from Dolphin's Barn to Firebase using
-          Sonitus API
-        </button>
-      </div>
-      <div>
-        <button onClick={handleMicrophoneButtonClick}>
-          Start Measuring Decibels for 5 Seconds and upload to Firebase
-        </button>
-        {averageDecibel !== null && (
-          <p>
-            Average Decibel reading over the last 5 seconds:{" "}
-            {averageDecibel.toFixed(2)}
-          </p>
-        )}
-      </div>
-      <div>
-        <button onClick={uploadLocationToFirebase}>
-          Upload Current Location to Firebase
-        </button>
-      </div>
-      <div>
-        <button onClick={testing}>
-          Testing fetching data for all monitors
-        </button>
+      <h1></h1>
+      <div
+        className="homeButtons"
+        style={{ display: "flex", flexDirection: "row" }}
+      >
+        <div style={{ flex: 1 }}>
+          <Visualisations averageDecibel={averageDecibel} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <button
+            className="home-page-button"
+            style={{ "--clr": "#39FF14" }}
+            onClick={uploadOpenData}
+          >
+            <span>
+              Upload real-time noise data to Firebase using Sonitus API
+            </span>
+            <i></i>
+          </button>
+          <button
+            className="home-page-button"
+            style={{ "--clr": "#FF44CC" }}
+            onClick={handleMicrophoneButtonClick}
+          >
+            <span>
+              Start Measuring Decibels for 5 Seconds and upload to Firebase
+            </span>
+            <i></i>
+          </button>
+          {averageDecibel !== null && (
+            <p>
+              Average Decibel reading over the last 5 seconds:{" "}
+              {averageDecibel.toFixed(2)}
+            </p>
+          )}
+          <button
+            className="home-page-button"
+            style={{ "--clr": "#0FF0FC" }}
+            onClick={uploadLocationToFirebase}
+          >
+            <span>Upload Current Location to Firebase</span>
+            <i></i>
+          </button>
+        </div>
       </div>
       {loading && <div className="loading-spinner"></div>}
       {showModal && (

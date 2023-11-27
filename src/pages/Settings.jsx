@@ -19,7 +19,7 @@ const Settings = () => {
 
   return (
     <div>
-      <h1>Settings</h1>
+      <h1 style={{ color: "#222222" }}>.</h1>
       <button onClick={logOut}>Log Out</button>
     </div>
   );

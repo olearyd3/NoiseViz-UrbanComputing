@@ -1,9 +1,11 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
+import { faHome, faCog } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Layout = () => {
   const location = useLocation();
 
-  // Check if the current route is the root ("/") and render the Login link accordingly
+  // check if the current route is the root ("/") and render the login link accordingly
   const isLoginPage = location.pathname === "/";
   const isSignupPage = location.pathname === "/signup";
 
@@ -13,19 +15,17 @@ const Layout = () => {
     <>
       {renderNavBar && (
         <nav>
-          <ul>
-            <li>
-              <Link to="/about">About</Link>
+          <ul className="iconContainer">
+            <li className="home-icon">
+              <Link to="/home">
+                <FontAwesomeIcon icon={faHome} style={{ fontSize: "35px" }} />
+              </Link>
             </li>
-            <li>
-              <Link to="/contact">Contact</Link>
-            </li>
-
-            <li>
-              <Link to="/home">Home</Link>
-            </li>
-            <li>
-              <Link to="/settings">Settings</Link>
+            <li className="title-icon">NoiseViz</li>
+            <li className="settings-icon">
+              <Link to="/settings">
+                <FontAwesomeIcon icon={faCog} style={{ fontSize: "35px" }} />
+              </Link>
             </li>
           </ul>
         </nav>

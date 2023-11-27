@@ -6,8 +6,6 @@ import { fetchDataFromAPI } from "./components/data";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -20,8 +18,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Login />} />
-          <Route path="about" element={<About />} />
-          <Route path="contact" element={<Contact />} />
           <Route path="home" element={<Home />} />
           <Route path="signup" element={<Signup />} />
           <Route path="settings" element={<Settings />} />
