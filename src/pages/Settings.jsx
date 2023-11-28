@@ -20,7 +20,7 @@ const Settings = () => {
   return (
     <div>
       <h1 style={{ color: "#222222" }}>.</h1>
-      <button onClick={logOut}>Log Out</button>
+      <button className="gsi-material-button" onClick={logOut}>Log Out</button>
     </div>
   );
 };

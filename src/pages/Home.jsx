@@ -85,7 +85,6 @@ function Home() {
 
       setLoading(false);
       openModal("Data successfully uploaded to Firebase!");
-      setFirebaseData(newData);
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
@@ -131,46 +130,6 @@ function Home() {
   useEffect(() => {
     calculateLocation();
   }, []);
-
-  // method to upload current location to Firebase
-  const uploadLocationToFirebase = async () => {
-    // if there are values for longitude and latitude
-    if (latitude !== null && longitude !== null) {
-      const locationData = {
-        // set datetime to the current date and time
-        datetime: new Date(),
-        latitude,
-        longitude,
-      };
-      // the collection on Firebase
-      const locationDataCollectionRef = collection(db, "location-data");
-      try {
-        setLoading(true);
-        // create a timeout warning if it takes too long to load
-        timeoutRef.current = setTimeout(() => {
-          setLoading(false);
-          openModal("An error has occurred: Firebase Quota exceeded for today");
-        }, 5000);
-        // add the doc
-        await addDoc(locationDataCollectionRef, locationData);
-        // if data successfully uploaded
-        setLoading(false);
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-        // display modal with successful upload
-        openModal("Location data successfully uploaded to Firebase!");
-        console.log("Uploaded location data to Firebase: ", locationData);
-      } catch (error) {
-        // if data fails
-        console.error("Error adding location document: ", error);
-      }
-    } else {
-      // if data fails
-      setLoading(false);
-      openModal("Error uploading location data: " + error);
-      console.error("Location data is not available.");
-    }
-  };
 
   const [microphoneActive, setMicrophoneActive] = useState(false);
 
@@ -219,6 +178,7 @@ function Home() {
             // using 94 as DeciBel calibration value
             var decibels = 20 * Math.log10(average / 255) + 94;
 
+            // minus inifinity is the default value for an invalid reading -- do not use this in calculating average.
             if (decibels !== -Infinity) {
               decibelReadingsRef.current.push(decibels);
             }
@@ -448,7 +408,7 @@ function Home() {
             onClick={uploadOpenData}
           >
             <span>
-              Upload real-time noise data to Firebase using Sonitus API
+              Update API data on Firebase
             </span>
             <i></i>
           </button>
@@ -457,7 +417,8 @@ function Home() {
             style={{ "--clr": "#FF44CC" }}
             onClick={handleMicrophoneButtonClick}
           >
-            <span>Measure Current Noise Levels at your Location</span>
+            <span>Measure Current Noise Levels at your Location and upload to Firebase
+            </span>
             <i></i>
           </button>
           {averageDecibel !== null && (
@@ -466,14 +427,6 @@ function Home() {
               {averageDecibel.toFixed(2)}
             </p>
           )}
-          <button
-            className="home-page-button"
-            style={{ "--clr": "#0FF0FC" }}
-            onClick={uploadLocationToFirebase}
-          >
-            <span>Upload Current Location to Firebase</span>
-            <i></i>
-          </button>
           <div className="dropdown-container">
             <label htmlFor="monitorDropdown">Select Monitor: </label>
             <select
