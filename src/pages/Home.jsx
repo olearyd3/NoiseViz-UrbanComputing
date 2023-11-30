@@ -368,7 +368,7 @@ function Home() {
       .style("text-anchor", "middle")
       .text("dB");
 
-    // draw the line on the chart 
+    // draw the line on the chart
     svg
       .append("path")
       .datum(data)
@@ -407,9 +407,7 @@ function Home() {
             style={{ "--clr": "#39FF14" }}
             onClick={uploadOpenData}
           >
-            <span>
-              Update API data on Firebase
-            </span>
+            <span>Update API data on Firebase</span>
             <i></i>
           </button>
           <button
@@ -417,7 +415,9 @@ function Home() {
             style={{ "--clr": "#FF44CC" }}
             onClick={handleMicrophoneButtonClick}
           >
-            <span>Measure Current Noise Levels at your Location and upload to Firebase
+            <span>
+              Measure Current Noise Levels at your Location and upload to
+              Firebase
             </span>
             <i></i>
           </button>
