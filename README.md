@@ -32,4 +32,4 @@ This is my web app, NoiseViz, created as part of Assignment 4 for the module CS7
 
 ### The application being used
 
-![](https://github.com/olearyd3/NoiseViz-UrbanComputing/src/assets/NoiseViz.gif)
+![](https://github.com/olearyd3/NoiseViz-UrbanComputing/blob/main/src/assets/NoiseViz.gif)
