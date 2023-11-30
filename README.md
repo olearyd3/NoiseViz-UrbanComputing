@@ -29,3 +29,7 @@ This is my web app, NoiseViz, created as part of Assignment 4 for the module CS7
 5. The line chart can be edited using the dropdown menu above it.
 
 6. The settings page can be accessed where users can log out of their account.
+
+### The application being used
+
+![](https://github.com/NoiseViz-UrbanComputing/src/assets/NoiseViz.mov)
